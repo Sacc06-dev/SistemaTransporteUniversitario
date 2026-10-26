@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Transporte.Datos/Transporte.Datos.vbproj" />
+  <Project Path="Transporte.Entidades/Transporte.Entidades.vbproj" />
+  <Project Path="Transporte.Negocio/Transporte.Negocio.vbproj" Id="f3c9c3af-7039-4e16-91f2-bacc1718494e" />
+  <Project Path="Transporte.Presentacion/Transporte.Presentacion.vbproj" />
+</Solution>
