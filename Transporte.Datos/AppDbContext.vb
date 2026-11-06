@@ -1,6 +1,6 @@
 Imports Microsoft.EntityFrameworkCore
 Imports Transporte.Entidades
-
+'klk'
 Public Class AppDbContext
     Inherits DbContext
 
