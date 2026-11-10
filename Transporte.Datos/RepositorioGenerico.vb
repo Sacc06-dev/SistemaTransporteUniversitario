@@ -17,13 +17,20 @@ Public Class RepositorioGenerico(Of T As Class)
 
 
     Public Function ObtenerPorId(id As Integer) As T
-        Return _dbSet.Find(id)
+        Dim entidad = _dbSet.Find(id)
+        If entidad IsNot Nothing Then _ctx.Entry(entidad).State = EntityState.Detached
+        Return entidad
     End Function
 
 
     Public Sub Agregar(entidad As T)
         _dbSet.Add(entidad)
-        _ctx.SaveChanges()
+        Try
+            _ctx.SaveChanges()
+        Catch
+            _ctx.Entry(entidad).State = EntityState.Detached
+            Throw
+        End Try
     End Sub
 
 
@@ -41,8 +48,13 @@ Public Class RepositorioGenerico(Of T As Class)
 
         Dim existente = _dbSet.Find(keyValues)
         If existente IsNot Nothing Then
-            _ctx.Entry(existente).CurrentValues.SetValues(entidad)
-            _ctx.SaveChanges()
+            Try
+                _ctx.Entry(existente).CurrentValues.SetValues(entidad)
+                _ctx.SaveChanges()
+            Catch
+                _ctx.Entry(existente).State = EntityState.Detached
+                Throw
+            End Try
         End If
     End Sub
 
@@ -58,7 +70,12 @@ Public Class RepositorioGenerico(Of T As Class)
     Public Sub Eliminar(entidad As T)
         If entidad IsNot Nothing Then
             _dbSet.Remove(entidad)
-            _ctx.SaveChanges()
+            Try
+                _ctx.SaveChanges()
+            Catch
+                _ctx.Entry(entidad).State = EntityState.Detached
+                Throw
+            End Try
         End If
     End Sub
 

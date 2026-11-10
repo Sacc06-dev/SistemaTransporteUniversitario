@@ -12,4 +12,9 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Transporte.Datos\Transporte.Datos.vbproj" />
+    <ProjectReference Include="..\Transporte.Entidades\Transporte.Entidades.vbproj" />
+  </ItemGroup>
+
 </Project>

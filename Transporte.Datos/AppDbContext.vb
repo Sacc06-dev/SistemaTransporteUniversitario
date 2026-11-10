@@ -153,7 +153,7 @@ Public Class AppDbContext
                 e.ToTable("RutaParada")
                 e.HasKey(Function(x) x.IdRutaParada)
                 e.HasIndex(Function(x) New With {x.IdRuta, x.IdParada}).IsUnique()
-                e.HasIndex(Function(x) New With {x.IdRuta, x.OrdenParada}).IsUnique()
+                e.HasIndex(Function(x) New With {x.IdRuta, x.IdOrdenParada}).IsUnique()
                 e.HasOne(Of Ruta)().WithMany().
                     HasForeignKey(Function(x) x.IdRuta).OnDelete(DeleteBehavior.Cascade)
                 e.HasOne(Of Parada)().WithMany().
