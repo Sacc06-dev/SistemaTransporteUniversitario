@@ -13,6 +13,7 @@ Public Class AppDbContext
     Public Property Rutas As DbSet(Of Ruta)
     Public Property Paradas As DbSet(Of Parada)
     Public Property RutasParadas As DbSet(Of RutaParada)
+    Public Property OrdenParada As DbSet(Of OrdenParada)
     Public Property Horarios As DbSet(Of Horario)
     Public Property Inscripciones As DbSet(Of Inscripcion)
     Public Property Asignaciones As DbSet(Of Asignacion)
@@ -34,6 +35,7 @@ Public Class AppDbContext
                 e.ToTable("TipoUsuario")
                 e.HasKey(Function(x) x.IdTipoUsuario)
                 e.Property(Function(x) x.Nombre).HasMaxLength(50).IsRequired()
+                e.Property(Function(x) x.Estado).HasMaxLength(20).IsRequired().HasDefaultValue("Activo")
                 e.HasIndex(Function(x) x.Nombre).IsUnique()
             End Sub)
 
@@ -114,6 +116,7 @@ Public Class AppDbContext
                 e.Property(Function(x) x.TipoTransmision).HasMaxLength(30)
                 e.Property(Function(x) x.TipoCombustible).HasMaxLength(30)
                 e.Property(Function(x) x.Color).HasMaxLength(30)
+                e.Property(Function(x) x.TieneBano).HasDefaultValue(False)
                 e.HasIndex(Function(x) x.Matricula).IsUnique()
                 e.HasIndex(Function(x) x.Chasis).IsUnique()
                 e.HasOne(Of TipoVehiculo)().WithMany().
@@ -133,6 +136,7 @@ Public Class AppDbContext
                 e.Property(Function(x) x.DistanciaKm).HasColumnType("decimal(8,2)")
                 e.Property(Function(x) x.Estado).HasMaxLength(20).IsRequired().HasDefaultValue("Activa")
                 e.HasIndex(Function(x) x.Nombre).IsUnique()
+                e.Property(Function(x) x.DuracionEstimada).IsRequired()
             End Sub)
 
         modelBuilder.Entity(Of Parada)(
@@ -152,12 +156,28 @@ Public Class AppDbContext
             Sub(e)
                 e.ToTable("RutaParada")
                 e.HasKey(Function(x) x.IdRutaParada)
+                e.Property(Function(x) x.OrdenParada).IsRequired()
                 e.HasIndex(Function(x) New With {x.IdRuta, x.IdParada}).IsUnique()
-                e.HasIndex(Function(x) New With {x.IdRuta, x.IdOrdenParada}).IsUnique()
+                e.HasIndex(Function(x) New With {x.IdRuta, x.OrdenParada}).IsUnique()
+                e.Property(Function(x) x.EsPuntoOrigen).HasDefaultValue(False)
+                e.Property(Function(x) x.EsPuntoDestino).HasDefaultValue(False)
                 e.HasOne(Of Ruta)().WithMany().
-                    HasForeignKey(Function(x) x.IdRuta).OnDelete(DeleteBehavior.Cascade)
+                    HasForeignKey(Function(x) x.IdRuta).OnDelete(DeleteBehavior.Restrict)
                 e.HasOne(Of Parada)().WithMany().
                     HasForeignKey(Function(x) x.IdParada).OnDelete(DeleteBehavior.Restrict)
+            End Sub)
+
+        modelBuilder.Entity(Of OrdenParada)(
+            Sub(e)
+                e.ToTable("OrdenParada")
+                e.HasKey(Function(x) x.IdOrdenParada)
+                e.Property(Function(x) x.NumeroOrden).IsRequired()
+                e.Property(Function(x) x.Descripcion).HasMaxLength(200)
+                e.Property(Function(x) x.TiempoEstimadoLlegada)
+                e.Property(Function(x) x.Observaciones).HasMaxLength(300)
+                e.Property(Function(x) x.Estado).HasMaxLength(20).IsRequired().HasDefaultValue("Activo")
+                e.HasIndex(Function(x) New With {x.IdRutaParada, x.NumeroOrden}).IsUnique()
+                e.HasOne(Of RutaParada)().WithMany().HasForeignKey(Function(x) x.IdRutaParada).OnDelete(DeleteBehavior.Restrict)
             End Sub)
 
 
@@ -220,3 +240,5 @@ Public Class AppDbContext
     End Sub
 
 End Class
+
+

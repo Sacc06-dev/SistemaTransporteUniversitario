@@ -7,8 +7,8 @@
     Public Property Direccion As String
     Public Property Sector As String
 
-    Public Property Latitud As Decimal
-    Public Property Longitud As Decimal
+    Public Property Latitud As Decimal?
+    Public Property Longitud As Decimal?
 
     Public Property Estado As String
 

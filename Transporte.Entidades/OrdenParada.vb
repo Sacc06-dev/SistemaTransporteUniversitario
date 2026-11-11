@@ -8,7 +8,7 @@
 
     Public Property Descripcion As String
 
-    Public Property TiempoEstimadoLlegada As Integer
+    Public Property TiempoEstimadoLlegada As Integer?
 
     Public Property Observaciones As String
 
