@@ -17,6 +17,7 @@ Public Class ContactoServicio
 
     Protected Overrides Sub Validar(e As Contacto, original As Contacto)
         e.Estado = EstadoValido(e.Estado, Estados.ActivoInactivo, Estados.Activo)
+        If e.Estado <> Estados.Activo Then e.EsPrincipal = False
         e.ValorContacto = Requerido(e.ValorContacto, "Valor del contacto", 100)
 
         Dim tipo = Requerido(e.TipoContacto, "Tipo de contacto", 30)
@@ -32,6 +33,8 @@ Public Class ContactoServicio
             If restante.Any() OrElse digitos.Length < 7 OrElse digitos.Length > 15 Then
                 Throw New ValidacionException("El número de teléfono no es válido (entre 7 y 15 dígitos).")
             End If
+            ' Se guarda solo con dígitos (y el + inicial si lo tiene) para que el mismo número no se registre dos veces.
+            e.ValorContacto = If(e.ValorContacto.TrimStart().StartsWith("+"), "+", "") & digitos
         End If
 
         If e.IdUsuario.HasValue = e.IdConductor.HasValue Then Throw New ValidacionException("El contacto debe pertenecer a un usuario o a un conductor, pero no a ambos.")
@@ -49,7 +52,7 @@ Public Class ContactoServicio
         End If
 
         Dim valor = e.ValorContacto
-        If DelMismoDueno(e).Any(Function(x) x.TipoContacto = canonico AndAlso x.ValorContacto = valor) Then
+        If e.Estado = Estados.Activo AndAlso DelMismoDueno(e).Any(Function(x) x.Estado = Estados.Activo AndAlso x.TipoContacto = canonico AndAlso x.ValorContacto = valor) Then
             Throw New ValidacionException("Ese contacto ya está registrado para esta persona.")
         End If
     End Sub

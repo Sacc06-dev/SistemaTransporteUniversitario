@@ -40,12 +40,15 @@ Public Class HorarioServicio
         Dim hoy = Date.Today
 
         ' La asignación copia día y horas del horario: si cambian, las asignaciones pendientes quedarían incoherentes.
-        Dim cambioProgramacion = Not String.Equals(original.DiaSemana, e.DiaSemana, StringComparison.OrdinalIgnoreCase) OrElse original.HoraSalida <> e.HoraSalida OrElse original.HoraLlegada <> e.HoraLlegada
+        Dim cambioProgramacion = Not String.Equals(original.DiaSemana, e.DiaSemana, StringComparison.OrdinalIgnoreCase) OrElse original.HoraSalida <> e.HoraSalida OrElse original.HoraLlegada <> e.HoraLlegada OrElse cambioRuta
         Dim inactiva = Not activo AndAlso original.Estado = Estados.Activo
         If cambioProgramacion OrElse inactiva Then
             If Contexto.Asignaciones.Any(Function(x) x.IdHorario = e.IdHorario AndAlso x.Fecha >= hoy AndAlso (x.Estado = Estados.Programada OrElse x.Estado = Estados.EnCurso)) Then
-                Throw New ValidacionException("El horario tiene asignaciones pendientes. Cancélelas antes de cambiar su programación o inactivarlo.")
+                Throw New ValidacionException("El horario tiene asignaciones pendientes. Cancélelas antes de cambiar su programación, su ruta o inactivarlo.")
             End If
+        End If
+        If cambioRuta AndAlso Contexto.Inscripciones.Any(Function(x) x.IdHorario = e.IdHorario AndAlso x.Estado = Estados.Activa) Then
+            Throw New ValidacionException("El horario tiene inscripciones activas. Cancélelas antes de cambiarlo de ruta.")
         End If
         If inactiva AndAlso Contexto.Inscripciones.Any(Function(x) x.IdHorario = e.IdHorario AndAlso x.Estado = Estados.Activa) Then
             Throw New ValidacionException("El horario tiene inscripciones activas. Cancélelas antes de inactivarlo.")

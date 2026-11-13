@@ -73,7 +73,9 @@ Public Class AsignacionServicio
             End If
         End If
 
-        If Not (cambioProgramacion OrElse cambioRecursos) Then Return
+        ' Al arrancar el viaje se vuelve a comprobar que el conductor y el vehículo sigan en condiciones.
+        Dim arranca = original IsNot Nothing AndAlso original.Estado = Estados.Programada AndAlso e.Estado = Estados.EnCurso
+        If Not (cambioProgramacion OrElse cambioRecursos OrElse arranca) Then Return
 
         Dim conductor = Contexto.Conductores.Where(Function(x) x.IdConductor = e.IdConductor).Select(Function(x) x.Estado).FirstOrDefault()
         If conductor Is Nothing Then Throw New ValidacionException("El conductor seleccionado no existe.")
@@ -112,7 +114,8 @@ Public Class AsignacionServicio
         If e.Estado = Estados.EnCurso AndAlso antes <> Estados.EnCurso Then
             CambiarEstadoVehiculo(e.IdVehiculo, Estados.VehiculoEnRuta, Nothing)
         ElseIf antes = Estados.EnCurso AndAlso e.Estado <> Estados.EnCurso Then
-            CambiarEstadoVehiculo(original.IdVehiculo, Estados.VehiculoDisponible, Estados.VehiculoEnRuta)
+            Dim otroEnCurso = Contexto.Asignaciones.Any(Function(x) x.IdVehiculo = original.IdVehiculo AndAlso x.IdAsignacion <> e.IdAsignacion AndAlso x.Estado = Estados.EnCurso)
+            If Not otroEnCurso Then CambiarEstadoVehiculo(original.IdVehiculo, Estados.VehiculoDisponible, Estados.VehiculoEnRuta)
         End If
     End Sub
 

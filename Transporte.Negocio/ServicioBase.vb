@@ -1,4 +1,3 @@
-Imports System.ComponentModel.DataAnnotations
 Imports Microsoft.EntityFrameworkCore
 Imports Transporte.Datos
 
